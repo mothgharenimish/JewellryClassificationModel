@@ -9,6 +9,7 @@ from tensorflow.keras.layers import Dense,GlobalAveragePooling2D,Dropout
 from tensorflow.keras.models import Model
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.preprocessing.image import load_img, img_to_array
+import coremltools as ct
 
 img_size = 224
 batch_size = 32
@@ -145,5 +146,19 @@ while True:
         break
     predict_image(path)
 
+model = tf.keras.models.load_model("nasnetmobile_clothclassification.h5")
+
+converter = tf.lite.TFLiteConverter.from_keras_model(model)
+
+converter.optimizations = [tf.lite.Optimize.DEFAULT]
+
+tflite_model = converter.convert()
+
+print(tflite_model)
+
+with open("nasnet_image_classifier.tflite", "wb") as f:
+    f.write(tflite_model)
+
+print("Model successfully saved")
 
 
